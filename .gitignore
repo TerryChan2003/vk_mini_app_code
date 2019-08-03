@@ -4,6 +4,7 @@ node_modules
 ssl
 vue.config.js
 .editorconfig
+deploy.sh
 
 # local env files
 .env.local

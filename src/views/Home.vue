@@ -2,7 +2,7 @@
   <VKView activePanel="main">
     <Panel id="main">
       <PanelHeader>Список друзей</PanelHeader>
-      <Group v-bind:title="`Друзья (${this.countFriends})`">
+      <Group v-if="this.hasToken" v-bind:title="`Друзья (${this.countFriends})`">
         <Search @input="this.onChangeFind" />
         <List v-if="this.countFriends">
           <Cell
@@ -16,8 +16,17 @@
             {{friend.first_name}} {{friend.last_name}}
           </Cell>
         </List>
-        <Cell v-else>Упс... У вас нет друзей</Cell>
+        <Cell v-else>Никто не найден</Cell>
       </Group>
+      <Div v-else>
+        <PanelHeader>ТОКЕН ДАЙ</PanelHeader>
+        <Div align="center">
+          <b>Упс... Вы не дали доступ к друзьям.</b>
+          <br />
+          <br />
+          <Button size="l" @click="this.onClickToken">Разрешить доступ</Button>
+        </Div>
+      </Div>
     </Panel>
   </VKView>
 </template>
@@ -34,6 +43,9 @@ export default {
     ...mapMutations(["updateFindName"]),
     onChangeFind(e) {
       this.updateFindName(e);
+    },
+    onClickToken() {
+      this.fetchFriends();
     }
   },
   filters: {
@@ -49,7 +61,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["filteredFriends", "countFriends"])
+    ...mapGetters(["filteredFriends", "countFriends", "hasToken"]),
+    controller() {
+      if (this.hasToken || this.countFriends) {
+        return "main";
+      } else {
+        return "require";
+      }
+    }
   },
   mounted() {
     this.fetchFriends();
