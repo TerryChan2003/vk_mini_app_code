@@ -1,9 +1,9 @@
 <template>
   <VKView activePanel="main">
     <Panel id="main">
-      <PanelHeader>Список друзей</PanelHeader>
       <Group v-if="this.getStatus == 'success'" v-bind:title="`Друзья (${this.countFriends})`">
-        <Search @input="this.onChangeFind" />
+        <PanelHeader>Список друзей</PanelHeader>
+        <Search @input="this.updateFindName" />
         <List v-if="this.countFriends">
           <Cell
             v-for="friend in filteredFriends"
@@ -24,10 +24,11 @@
           <b>Упс... Вы не дали доступ к друзьям.</b>
           <br />
           <br />
-          <Button size="l" @click="this.onClickToken">Разрешить доступ</Button>
+          <Button size="l" @click="this.fetchFriends">Разрешить доступ</Button>
         </Div>
       </Div>
-      <Div v-else></Div>
+      <Div v-else>
+        <PanelHeader>Загрузка...</PanelHeader>
         <b>Подождите минуточку...</b>
       </Div>
     </Panel>
@@ -43,13 +44,7 @@ export default {
   },
   methods: {
     ...mapActions(["fetchFriends"]),
-    ...mapMutations(["updateFindName"]),
-    onChangeFind(e) {
-      this.updateFindName(e);
-    },
-    onClickToken() {
-      this.fetchFriends();
-    }
+    ...mapMutations(["updateFindName"])
   },
   filters: {
     getGenus(n) {
