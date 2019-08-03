@@ -2,7 +2,7 @@
   <VKView activePanel="main">
     <Panel id="main">
       <PanelHeader>Список друзей</PanelHeader>
-      <Group v-if="this.hasToken" v-bind:title="`Друзья (${this.countFriends})`">
+      <Group v-if="this.getStatus == 'success'" v-bind:title="`Друзья (${this.countFriends})`">
         <Search @input="this.onChangeFind" />
         <List v-if="this.countFriends">
           <Cell
@@ -18,14 +18,17 @@
         </List>
         <Cell v-else>Никто не найден</Cell>
       </Group>
-      <Div v-else>
-        <PanelHeader>ТОКЕН ДАЙ</PanelHeader>
+      <Div v-else-if="this.getStatus == 'denied'">
+        <PanelHeader>Предоставьте доступ</PanelHeader>
         <Div align="center">
           <b>Упс... Вы не дали доступ к друзьям.</b>
           <br />
           <br />
           <Button size="l" @click="this.onClickToken">Разрешить доступ</Button>
         </Div>
+      </Div>
+      <Div v-else></Div>
+        <b>Подождите минуточку...</b>
       </Div>
     </Panel>
   </VKView>
@@ -61,14 +64,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["filteredFriends", "countFriends", "hasToken"]),
-    controller() {
-      if (this.hasToken || this.countFriends) {
-        return "main";
-      } else {
-        return "require";
-      }
-    }
+    ...mapGetters(["filteredFriends", "countFriends", "getStatus"])
   },
   mounted() {
     this.fetchFriends();

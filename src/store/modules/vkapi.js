@@ -2,11 +2,12 @@ import connect from '@vkontakte/vkui-connect-promise'
 export default {
     actions: {
         fetchFriends(ctx) {
+            ctx.commit("updateStatus", "loading")
             connect
                 .send("VKWebAppGetAuthToken", {
                     app_id: 7080308,
                     scope: "friends"
-                })
+                }).catch(e => ctx.commit("updateStatus", "denied"))
                 .then(r => {
                     var token = r.data.access_token;
                     connect
@@ -21,8 +22,8 @@ export default {
                         .then(r => {
                             var friends = r.data.response.items;
                             ctx.commit("updateFriends", friends)
-                            ctx.commit("updateToken", token)
-                        });
+                            ctx.commit("updateStatus", "success")
+                        })
                 });
         }
     },
@@ -33,13 +34,13 @@ export default {
         updateFindName(state, find_name) {
             state.find_name = find_name.toLowerCase()
         },
-        updateToken(state, token) {
-            state.token = token
+        updateStatus(state, status) {
+            state.status = status
         }
     },
     state: {
         friends: [],
-        token: "",
+        status: "",
         find_name: ""
     },
     getters: {
@@ -56,8 +57,8 @@ export default {
                 return `${user.first_name} ${user.last_name}`.toLowerCase().indexOf(state.find_name) !== -1
             })
         },
-        hasToken(state) {
-            return !!state.token;
+        getStatus(state) {
+            return state.status;
         }
     }
 }
