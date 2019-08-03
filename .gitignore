@@ -3,6 +3,7 @@ node_modules
 /dist
 ssl
 vue.config.js
+.editorconfig
 
 # local env files
 .env.local
