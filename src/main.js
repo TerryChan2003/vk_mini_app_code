@@ -10,6 +10,9 @@ connect.send('VKWebAppInit')
 connect.send('VKWebAppGetUserInfo', {})
 import store from './store/index'
 
+import Vue2Filters from 'vue2-filters'
+
+Vue.use(Vue2Filters)
 Vue.use(PortalVue)
 
 Vue.config.productionTip = false

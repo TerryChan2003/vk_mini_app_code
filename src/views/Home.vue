@@ -2,19 +2,21 @@
   <VKView activePanel="main">
     <Panel id="main">
       <PanelHeader>Список друзей</PanelHeader>
-      <Group v-bind:title="'Друзья ('+ this.countFriends + ')'">
-        <List>
+      <Group v-bind:title="`Друзья (${this.countFriends})`">
+        <Search @input="this.onChangeFind" />
+        <List v-if="this.countFriends">
           <Cell
-            v-for="friend in allFriends"
+            v-for="friend in filteredFriends"
             :key="friend.id"
-            v-bind:indicator="friend.sex | getGenus"
+            :indicator="friend.sex | getGenus"
           >
             <template v-slot:before>
-              <Avatar type="image" v-bind:src="friend.photo_200" />
+              <Avatar type="image" :src="friend.photo_200" />
             </template>
             {{friend.first_name}} {{friend.last_name}}
           </Cell>
         </List>
+        <Cell v-else>Упс... У вас нет друзей</Cell>
       </Group>
     </Panel>
   </VKView>
@@ -22,12 +24,18 @@
 
 <script>
 import connect from "@vkontakte/vkui-connect-promise";
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 export default {
   data() {
     return {};
   },
-  methods: mapActions(["fetchFriends"]),
+  methods: {
+    ...mapActions(["fetchFriends"]),
+    ...mapMutations(["updateFindName"]),
+    onChangeFind(e) {
+      this.updateFindName(e);
+    }
+  },
   filters: {
     getGenus(n) {
       switch (n) {
@@ -40,7 +48,9 @@ export default {
       }
     }
   },
-  computed: mapGetters(["allFriends", "countFriends"]),
+  computed: {
+    ...mapGetters(["filteredFriends", "countFriends"])
+  },
   mounted() {
     this.fetchFriends();
   }
