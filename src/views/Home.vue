@@ -1,12 +1,17 @@
 <template>
   <VKView activePanel="main">
     <Panel id="main">
-      <Group v-if="this.getStatus == 'success'" v-bind:title="`Друзья (${this.countFriends})`">
+      <Group
+        v-if="this.getStatus == 'success'"
+        v-bind:title="`Друзья (${this.filteredFriends.length})`"
+      >
         <PanelHeader>Список друзей</PanelHeader>
-        <Search @input="this.updateFindName" />
-        <List v-if="this.countFriends">
+        <Div>
+          <Search v-model="search" theme="content" placeholder="Поиск" />
+        </Div>
+        <List v-if="this.filteredFriends.length">
           <Cell
-            v-for="friend in filteredFriends"
+            v-for="friend in paginatedFriends"
             :key="friend.id"
             :indicator="friend.sex | getGenus"
           >
@@ -15,6 +20,7 @@
             </template>
             {{friend.first_name}} {{friend.last_name}}
           </Cell>
+          <infinite-loading @infinite="this.infiniteHandler"></infinite-loading>
         </List>
         <Cell v-else>Никто не найден</Cell>
       </Group>
@@ -38,13 +44,24 @@
 <script>
 import connect from "@vkontakte/vkui-connect-promise";
 import { mapGetters, mapActions, mapMutations } from "vuex";
+import InfiniteLoading from "vue-infinite-loading";
 export default {
   data() {
-    return {};
+    return {
+      search: "",
+      currentPage: 1
+    };
   },
   methods: {
     ...mapActions(["fetchFriends"]),
-    ...mapMutations(["updateFindName"])
+    infiniteHandler($state) {
+      if (this.currentPage * 20 > this.filteredFriends.length) {
+        $state.complete();
+      } else {
+        this.currentPage++;
+        $state.loaded();
+      }
+    }
   },
   filters: {
     getGenus(n) {
@@ -59,7 +76,22 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["filteredFriends", "countFriends", "getStatus"])
+    ...mapGetters(["allFriends", "getStatus"]),
+    filteredFriends() {
+      return this.allFriends.filter(user => {
+        return (
+          `${user.first_name} ${user.last_name}`
+            .toLowerCase()
+            .indexOf(this.search.toLowerCase()) !== -1
+        );
+      });
+    },
+    paginatedFriends() {
+      return this.filteredFriends.slice(0, 20 * this.currentPage);
+    }
+  },
+  components: {
+    InfiniteLoading
   },
   mounted() {
     this.fetchFriends();

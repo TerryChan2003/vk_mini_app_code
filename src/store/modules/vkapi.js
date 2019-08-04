@@ -16,6 +16,7 @@ export default {
                             params: {
                                 v: "5.101",
                                 fields: "photo_200, sex",
+                                count: "10000",
                                 access_token: token
                             }
                         })
@@ -31,31 +32,17 @@ export default {
         updateFriends(state, friends) {
             state.friends = friends
         },
-        updateFindName(state, find_name) {
-            state.find_name = find_name.toLowerCase()
-        },
         updateStatus(state, status) {
             state.status = status
         }
     },
     state: {
         friends: [],
-        status: "",
-        find_name: ""
+        status: ""
     },
     getters: {
         allFriends(state) {
             return state.friends
-        },
-        countFriends(state) {
-            return state.friends.filter((user) => {
-                return `${user.first_name} ${user.last_name}`.toLowerCase().indexOf(state.find_name) !== -1
-            }).length
-        },
-        filteredFriends(state) {
-            return state.friends.filter((user) => {
-                return `${user.first_name} ${user.last_name}`.toLowerCase().indexOf(state.find_name) !== -1
-            })
         },
         getStatus(state) {
             return state.status;
