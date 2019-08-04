@@ -6,9 +6,7 @@
         v-bind:title="`Друзья (${this.filteredFriends.length})`"
       >
         <PanelHeader>Список друзей</PanelHeader>
-        <Div>
-          <Search v-model="search" theme="content" placeholder="Поиск" />
-        </Div>
+        <Search v-model="search" theme="content" placeholder="Поиск" />
         <List v-if="this.filteredFriends.length">
           <Cell
             v-for="friend in paginatedFriends"
@@ -36,6 +34,7 @@
       <Div v-else>
         <PanelHeader>Загрузка...</PanelHeader>
         <b>Подождите минуточку...</b>
+        <ScreenSpinner />
       </Div>
     </Panel>
   </VKView>
