@@ -5,7 +5,7 @@
         @click="currentPanel = 'friend_list_panel'"
         :selected="currentPanel == 'friend_list_panel'"
       >
-        <vkui-icon name="market_outline" size="24" />
+        <vkui-icon name="list" size="24" />
       </TabbarItem>
       <TabbarItem @click="currentPanel = 'profile'" :selected="currentPanel == 'profile'">
         <vkui-icon name="user_outline" size="24" />
