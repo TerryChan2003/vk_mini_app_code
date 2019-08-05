@@ -7,7 +7,6 @@ import PortalVue from 'portal-vue'
 import components from '@urapywka/vkui/src/components'
 import connect from '@vkontakte/vkui-connect'
 connect.send('VKWebAppInit')
-connect.send('VKWebAppGetUserInfo', {})
 import store from './store'
 Vue.use(PortalVue)
 

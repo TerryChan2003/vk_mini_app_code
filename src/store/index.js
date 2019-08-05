@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import VkApi from './modules/vkapi'
+import vkapi from "./modules/vkapi"
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     modules: {
-        VkApi
+        vkapi
     }
 })

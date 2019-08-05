@@ -1,99 +1,48 @@
 <template>
-  <VKView activePanel="main">
-    <Panel id="main">
-      <Group
-        v-if="this.getStatus == 'success'"
-        v-bind:title="`Друзья (${this.filteredFriends.length})`"
+  <Epic :activeStory="currentRoot">
+    <Tabbar slot="tabbar">
+      <TabbarItem
+        @click="currentPanel = 'friend_list_panel'"
+        :selected="currentPanel == 'friend_list_panel'"
       >
-        <PanelHeader>Список друзей</PanelHeader>
-        <Search v-model="search" theme="content" placeholder="Поиск" />
-        <List v-if="this.filteredFriends.length">
-          <Cell
-            v-for="friend in paginatedFriends"
-            :key="friend.id"
-            :indicator="friend.sex | getGenus"
-          >
-            <template v-slot:before>
-              <Avatar type="image" :src="friend.photo_200" />
-            </template>
-            {{friend.first_name}} {{friend.last_name}}
-          </Cell>
-          <infinite-loading @infinite="this.infiniteHandler"></infinite-loading>
-        </List>
-        <Cell v-else>Никто не найден</Cell>
-      </Group>
-      <Div v-else-if="this.getStatus == 'denied'">
-        <PanelHeader>Предоставьте доступ</PanelHeader>
-        <Div align="center">
-          <b>Упс... Вы не дали доступ к друзьям.</b>
-          <br />
-          <br />
-          <Button size="l" @click="this.fetchFriends">Разрешить доступ</Button>
-        </Div>
-      </Div>
-      <Div v-else>
-        <PanelHeader>Загрузка...</PanelHeader>
-        <b>Подождите минуточку...</b>
-        <ScreenSpinner />
-      </Div>
-    </Panel>
-  </VKView>
+        <vkui-icon name="market_outline" size="24" />
+      </TabbarItem>
+      <TabbarItem @click="currentPanel = 'profile'" :selected="currentPanel == 'profile'">
+        <vkui-icon name="user_outline" size="24" />
+      </TabbarItem>
+    </Tabbar>
+    <Root id="main_root" :activeView="currentView" key="main_root">
+      <VKView id="main_view" :activePanel="currentPanel" key="main_view">
+        <Panel id="friend_list_panel">
+          <FriendList />
+        </Panel>
+        <Panel id="profile">
+          <Personal />
+        </Panel>
+      </VKView>
+    </Root>
+  </Epic>
 </template>
 
+
 <script>
-import connect from "@vkontakte/vkui-connect-promise";
-import { mapGetters, mapActions, mapMutations } from "vuex";
-import InfiniteLoading from "vue-infinite-loading";
+import FriendList from "./HomeComponents/FriendList";
+import Personal from "./HomeComponents/Personal";
 export default {
   data() {
     return {
-      search: "",
-      currentPage: 1
+      currentPanel: "friend_list_panel",
+      currentView: "main_view",
+      currentRoot: "main_root"
     };
   },
-  methods: {
-    ...mapActions(["fetchFriends"]),
-    infiniteHandler($state) {
-      if (this.currentPage * 20 > this.filteredFriends.length) {
-        $state.complete();
-      } else {
-        this.currentPage++;
-        $state.loaded();
-      }
-    }
-  },
-  filters: {
-    getGenus(n) {
-      switch (n) {
-        case 0:
-          return "Оно";
-        case 1:
-          return "Она";
-        case 2:
-          return "Он";
-      }
-    }
-  },
-  computed: {
-    ...mapGetters(["allFriends", "getStatus"]),
-    filteredFriends() {
-      return this.allFriends.filter(user => {
-        return (
-          `${user.first_name} ${user.last_name}`
-            .toLowerCase()
-            .indexOf(this.search.toLowerCase()) !== -1
-        );
-      });
-    },
-    paginatedFriends() {
-      return this.filteredFriends.slice(0, 20 * this.currentPage);
-    }
-  },
+  methods: {},
+  filters: {},
+  computed: {},
   components: {
-    InfiniteLoading
+    FriendList,
+    Personal
   },
-  mounted() {
-    this.fetchFriends();
-  }
+  mounted() {}
 };
 </script>
